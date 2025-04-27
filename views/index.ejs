@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data - SSE Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .sensor-data {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sensor-data p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .client-list, .logs-table {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sensor Data and Logs</h1>
+
+    <div class="client-list">
+        <h2>Connected Clients (IPs)</h2>
+        <ul>
+            <% connectedClients.forEach(ip => { %>
+                <li><%= ip %></li>
+            <% }) %>
+        </ul>
+    </div>
+
+    <div class="logs-table">
+        <h2>Request Logs (GET and POST)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>URL</th>
+                    <th>Data</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% requestLogs.forEach(log => { %>
+                    <tr>
+                        <td><%= log.method %></td>
+                        <td><%= log.url %></td>
+                        <td><%= JSON.stringify(log.data) %></td>
+                        <td><%= log.timestamp %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="sensor-data">
+        <h2>Real-time Sensor Data (SSE)</h2>
+        <div id="sensorData"></div>
+    </div>
+
+    <script>
+        const source = new EventSource('/subscribe');
+
+        source.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const sensorDataDiv = document.getElementById('sensorData');
+            sensorDataDiv.innerHTML = `
+                <p><strong>Sensor 1:</strong> ${data.s1}</p>
+                <p><strong>Sensor 2:</strong> ${data.s2}</p>
+                <p><strong>Sensor 3:</strong> ${data.s3}</p>
+                <p><strong>Sensor 4:</strong> ${data.s4}</p>
+                <p><strong>Date:</strong> ${data.date}</p>
+                <p><strong>Time:</strong> ${data.time}</p>
+            `;
+        };
+    </script>
+</body>
+</html>
