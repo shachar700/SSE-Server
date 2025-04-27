@@ -1,112 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data - SSE Server</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        h2 {
-            color: #555;
-        }
-        ul {
-            padding-left: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .sensor-data {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .sensor-data p {
-            margin: 5px 0;
-            font-size: 16px;
-        }
-        .client-list, .logs-table {
-            margin-bottom: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Line Sensor Data</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #333; }
+    #tabs { margin-bottom: 20px; }
+    .tab { display: inline-block; padding: 10px 20px; background-color: #f0f0f0; cursor: pointer; }
+    .tab:hover { background-color: #ddd; }
+    .tab-content { display: none; margin-top: 20px; }
+    .active { display: block; }
+    #data { margin-top: 20px; }
+    .data-item { margin: 5px 0; }
+  </style>
 </head>
 <body>
+  <h1>SSE Server - Production Line Data D106</h1>
 
-    <h1>Sensor Data and Logs</h1>
+  <!-- Tabs -->
+  <div id="tabs">
+    <div class="tab" onclick="showTab('users')">Connected Users</div>
+    <div class="tab" onclick="showTab('logs')">Logs</div>
+  </div>
 
-    <div class="client-list">
-        <h2>Connected Clients (IPs)</h2>
-        <ul>
-            <% connectedClients.forEach(ip => { %>
-                <li><%= ip %></li>
-            <% }) %>
-        </ul>
-    </div>
+  <!-- Tab Contents -->
+  <div id="users" class="tab-content active">
+    <h3>Users Connected</h3>
+    <ul id="user-list">
+      <% users.forEach(user => { %>
+        <li>User ID: <%= user.id %></li>
+      <% }) %>
+    </ul>
+  </div>
 
-    <div class="logs-table">
-        <h2>Request Logs (GET and POST)</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Method</th>
-                    <th>URL</th>
-                    <th>Data</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% requestLogs.forEach(log => { %>
-                    <tr>
-                        <td><%= log.method %></td>
-                        <td><%= log.url %></td>
-                        <td><%= JSON.stringify(log.data) %></td>
-                        <td><%= log.timestamp %></td>
-                    </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
+  <div id="logs" class="tab-content">
+    <h3>Publish Data Logs</h3>
+    <ul id="log-list">
+      <% logs.forEach(log => { %>
+        <li>Station 1: <%= log.station1 %>, Station 2: <%= log.station2 %>, Station 3: <%= log.station3 %>, Station 4: <%= log.station4 %>, Time: <%= log.timestamp %></li>
+      <% }) %>
+    </ul>
+  </div>
 
-    <div class="sensor-data">
-        <h2>Real-time Sensor Data (SSE)</h2>
-        <div id="sensorData"></div>
-    </div>
+  <script>
+    // Function to switch tabs
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
 
-    <script>
-        const source = new EventSource('/subscribe');
+    // Set up EventSource to receive data from SSE endpoint
+    const eventSource = new EventSource('/subscribe');
+    
+    eventSource.onmessage = function(event) {
+      const data = JSON.parse(event.data);
 
-        source.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            const sensorDataDiv = document.getElementById('sensorData');
-            sensorDataDiv.innerHTML = `
-                <p><strong>Sensor 1:</strong> ${data.s1}</p>
-                <p><strong>Sensor 2:</strong> ${data.s2}</p>
-                <p><strong>Sensor 3:</strong> ${data.s3}</p>
-                <p><strong>Sensor 4:</strong> ${data.s4}</p>
-                <p><strong>Date:</strong> ${data.date}</p>
-                <p><strong>Time:</strong> ${data.time}</p>
-            `;
-        };
-    </script>
+      // Update log list (for this demo, logs are updated in real-time)
+      const logList = document.getElementById('log-list');
+      const logItem = document.createElement('li');
+      logItem.textContent = `Station1: ${data.station1}, Station2: ${data.station2}, Station3: ${data.station3}, Station4: ${data.station4}, Time: ${new Date().toLocaleString()}`;
+      logList.appendChild(logItem);
+    };
+    
+    eventSource.onerror = function() {
+      console.error('Error receiving SSE.');
+    };
+  </script>
 </body>
 </html>
