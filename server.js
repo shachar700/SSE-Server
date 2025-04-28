@@ -55,8 +55,6 @@ app.get('/subscribe', (req, res) => {
 
   // Clean up when the user disconnects
   req.on('close', () => {
-    users = users.filter(user => user.id !== userID);
-    clearInterval(interval);
   });
 });
 
@@ -67,7 +65,7 @@ const sendToSubscribers = () => {
 
   const data = JSON.stringify({ message: "Hello, time is " + new Date().toISOString() });
 
-  clients.forEach(res => {
+  users.forEach(res => {
     res.write(`data: ${data}\n\n`);
   });
 };
