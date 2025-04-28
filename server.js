@@ -64,9 +64,12 @@ app.get('/subscribe', (req, res) => {
 const sendToSubscribers = () => {
   // Here you can implement logic to send data to all connected subscribers.
   // For simplicity, we're pushing the data to subscribers through SSE every 2 seconds.
-  users.forEach(user => {
-    user.write({ msg: "hello world"})
-  });
+
+  const data = JSON.stringify({ message: "Hello, time is " + new Date().toISOString() });
+
+  clients.forEach(res => {
+    res.write(`data: ${data}\n\n`);
+  });
 };
 
 // Start the server (for local development)
