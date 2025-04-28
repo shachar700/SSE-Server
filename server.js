@@ -43,7 +43,7 @@ app.post('/publish', (req, res) => {
 // SSE endpoint: Send data to subscribers
 app.get('/subscribe', (req, res) => {
   const userID = Date.now();  // Unique ID for each user based on timestamp
-  users.push({ id: userID });
+  users.push( res );
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -52,11 +52,6 @@ app.get('/subscribe', (req, res) => {
 
   // Send the current sensor data to the subscriber
   res.write(`data: ${JSON.stringify(sensorData)}\n\n`);
-
-  // Send data to the subscriber every 2 seconds (simulate sensor updates)
-  const interval = setInterval(() => {
-    res.write(`data: ${JSON.stringify(sensorData)}\n\n`);
-  }, 100);
 
   // Clean up when the user disconnects
   req.on('close', () => {
@@ -70,7 +65,7 @@ const sendToSubscribers = () => {
   // Here you can implement logic to send data to all connected subscribers.
   // For simplicity, we're pushing the data to subscribers through SSE every 2 seconds.
   users.forEach(user => {
-    // You can maintain the connections in a list and broadcast to all subscribers
+    user.write("Hi")
   });
 };
 
