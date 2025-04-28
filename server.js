@@ -65,7 +65,7 @@ const sendToSubscribers = () => {
   // Here you can implement logic to send data to all connected subscribers.
   // For simplicity, we're pushing the data to subscribers through SSE every 2 seconds.
   users.forEach(user => {
-    user.write("Hi")
+    user.write({ msg: "hello world"})
   });
 };
 
