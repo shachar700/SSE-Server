@@ -119,10 +119,8 @@ async function endAndSaveRecording() {
   const name = `simulation_${simulationCount}`;
   const saved = await Simulation.create({ name, data: recordingBuffer });
 
-  const localIPs = ['127.0.0.1', 'localhost'];
-  const isLocal = localIPs.includes(getLocalIP());
-
-  if (isLocal) {
+  // Only write locally based on env variable
+  if (process.env.LOCAL === 'true') {
     fs.writeFileSync(`${name}.json`, JSON.stringify(recordingBuffer, null, 2));
   }
   return saved;
