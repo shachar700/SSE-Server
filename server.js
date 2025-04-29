@@ -120,9 +120,10 @@ async function endAndSaveRecording() {
   const saved = await Simulation.create({ name, data: recordingBuffer });
 
   // Only write locally based on env variable
+  /*
   if (process.env.LOCAL === 'true') {
     fs.writeFileSync(`${name}.json`, JSON.stringify(recordingBuffer, null, 2));
-  }
+  }*/
   return saved;
 }
 
