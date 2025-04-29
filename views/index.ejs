@@ -21,22 +21,22 @@
 
   <!-- Tabs -->
   <div id="tabs">
-    <div class="tab" onclick="showTab('users')">Connected Users</div>
-    <div class="tab" onclick="showTab('logs')">Logs</div>
+    <div class="tab" onclick="showTab('users')">Connected Subscribers</div>
+    <div class="tab" onclick="showTab('logs')">Subscriber Logs</div>
   </div>
 
   <!-- Tab Contents -->
   <div id="users" class="tab-content active">
-    <h3>Users Connected</h3>
+    <h3>Subscribers Connected</h3>
     <ul id="user-list">
       <% users.forEach(user => { %>
-        <li>User ID: <%= user.id %></li>
+        <li>IP Address: <%= user.ip %></li>
       <% }) %>
     </ul>
   </div>
 
   <div id="logs" class="tab-content">
-    <h3>Publish Data Logs</h3>
+    <h3>Subscribers Data Logs</h3>
     <ul id="log-list">
       <% logs.forEach(log => { %>
         <li>Station 1: <%= log.station1 %>, Station 2: <%= log.station2 %>, Station 3: <%= log.station3 %>, Station 4: <%= log.station4 %>, Time: <%= log.timestamp %></li>
