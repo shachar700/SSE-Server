@@ -25,7 +25,7 @@ let sensorData = { station1: "", station2: "", station3: "", station4: "" };
 // IP tracking and response subscription
 app.use((req, res, next) => {
   req.clientIp = req.headers['x-forwarded-for'] || req.ip.remoteAddress;
-  if (isRecording  && req.path !== '/endRecording') {
+  if (isRecording && req.path !== '/endRecording') {
     recordingBuffer.push({
       timestamp: new Date().toISOString(),
       requestType: req.method,
@@ -119,7 +119,12 @@ async function endAndSaveRecording() {
   const name = `simulation_${simulationCount}`;
   const saved = await Simulation.create({ name, data: recordingBuffer });
 
-  fs.writeFileSync(`${name}.json`, JSON.stringify(recordingBuffer, null, 2));
+  const localIPs = ['127.0.0.1', 'localhost'];
+  const isLocal = localIPs.includes(getLocalIP());
+
+  if (isLocal) {
+    fs.writeFileSync(`${name}.json`, JSON.stringify(recordingBuffer, null, 2));
+  }
   return saved;
 }
 
