@@ -5,8 +5,10 @@ const os = require('os');
 const fs = require('fs');
 const app = express();
 
+const uri = process.env.MONGODB_URI;
+
 // MongoDB Setup
-mongoose.connect('mongodb+srv://braudeproject2025:BraudeProject12321@cluster0.cvwjn0s.mongodb.net/prodline_db?retryWrites=true&w=majority');
+mongoose.connect(uri);
 
 const simulationSchema = new mongoose.Schema({ name: String, data: Array });
 const Simulation = mongoose.model('Simulation', simulationSchema);
@@ -100,16 +102,11 @@ app.get('/startRecording', (req, res) => {
 });
 
 app.get('/endRecording', async (req, res) => {
-  if (!isRecording) {
-    return res.status(400).send('No active recording');
-  }
-
-  try {
+  if (isRecording) {
     const saved = await endAndSaveRecording();
     res.status(200).json(saved.data);
-  } catch (err) {
-    console.error('Error ending recording:', err);
-    res.status(500).send('Internal server error');
+  } else {
+    res.status(400).send('No active recording');
   }
 });
 
@@ -125,10 +122,9 @@ async function endAndSaveRecording() {
   const saved = await Simulation.create({ name, data: recordingBuffer });
 
   // Only write locally based on env variable
-  /*
   if (process.env.LOCAL === 'true') {
     fs.writeFileSync(`${name}.json`, JSON.stringify(recordingBuffer, null, 2));
-  }*/
+  }
   return saved;
 }
 
