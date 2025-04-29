@@ -100,11 +100,16 @@ app.get('/startRecording', (req, res) => {
 });
 
 app.get('/endRecording', async (req, res) => {
-  if (isRecording) {
+  if (!isRecording) {
+    return res.status(400).send('No active recording');
+  }
+
+  try {
     const saved = await endAndSaveRecording();
     res.status(200).json(saved.data);
-  } else {
-    res.status(400).send('No active recording');
+  } catch (err) {
+    console.error('Error ending recording:', err);
+    res.status(500).send('Internal server error');
   }
 });
 
